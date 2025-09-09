@@ -29,9 +29,9 @@ const dados = {
     },
     {
       id: "4",
-      nome: "Café com leite",
+      nome: "Cappuccino",
       imagem: "./image/product-04.png",
-      descricao: "Imagine um Café com leite como um abraço acolhedor em uma xícara. Com sua cor profunda e rica, ele é o convite perfeito para um momento de pausa. O aroma intenso que sobe suavemente é como um caloroso cumprimento, prometendo um instante de prazer e concentração. Ao dar o primeiro gole, a textura aveludada e o sabor robusto envolvem o paladar, oferecendo um equilíbrio encantador entre a doçura e a leve amargura. É um prazer pequeno, mas incrivelmente satisfatório, ideal para um rápido reequilíbrio durante o dia. Cada xícara é uma pausa deliciosa, um momento só seu, para recarregar e seguir em frente com renovada energia e tranquilidade.",
+      descricao: "Bebida italiana feita de café expresso, leite vaporizado e espuma de leite, resultando num equilíbrio entre intensidade do café, cremosidade do leite e suavidade da espuma.",
       preco: { de: 1000, por: 1000 },
       vegano: false,
       categoria: "classicos"
@@ -105,7 +105,7 @@ const dados = {
       imagem: "./image/product-12.png",
       descricao: "Imagine um Milk shake de café com laranja e tônica como um abraço acolhedor em uma xícara. Com sua cor profunda e rica, ele é o convite perfeito para um momento de pausa. O aroma intenso que sobe suavemente é como um caloroso cumprimento, prometendo um instante de prazer e concentração. Ao dar o primeiro gole, a textura aveludada e o sabor robusto envolvem o paladar, oferecendo um equilíbrio encantador entre a doçura e a leve amargura. É um prazer pequeno, mas incrivelmente satisfatório, ideal para um rápido reequilíbrio durante o dia. Cada xícara é uma pausa deliciosa, um momento só seu, para recarregar e seguir em frente com renovada energia e tranquilidade.",
       preco: { de: 1000, por: 800 },
-      vegano: true,
+      vegano: false,
       categoria: "gelados"
     }
   ],
@@ -175,3 +175,5 @@ const dados = {
     }
   ]
 };
+
+export {dados};
