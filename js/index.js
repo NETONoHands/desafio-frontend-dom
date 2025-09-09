@@ -17,7 +17,7 @@ dados.produtos.forEach(produto => {
 
     const preco = document.createElement('h3');
     preco.classList.add('products__list--price');
-    preco.innerHTML = 'R$ ' + (produto.preco.por /100).toFixed(2).replace('.', ',') + '<span> R$ ' + (produto.preco.de /100).toFixed(2).replace('.',',') + '</span>';
+    preco.innerHTML = 'R$ ' + formataPreco(produto.preco.por) + '<span> R$ ' + formataPreco(produto.preco.de) + '</span>';
 
     const nome = document.createElement('h4');
     nome.classList.add('products__list--name');
@@ -226,8 +226,9 @@ botaoFechar.addEventListener('click', () => {
 
 deletaTudo.addEventListener('click', () => {
     salvaCarrinho([]);
-    carregaCarrinho([]);
+    criaItemCart([]);
     atualizaNumeroCarrinho([]);
+    quantidadeSpan.textContent = '0 item(ns)';
 })
 
 
@@ -237,110 +238,110 @@ function criaItemCart(carrinho = carregaCarrinho()) {
     let valor = 0;
 
     carrinho.forEach((item) => {
-        valor = item.preco * item.quantidade;
+        valor += item.preco * item.quantidade;
 
         const itemCarrinho = document.createElement('div');
-    itemCarrinho.classList.add('cart__product');
+        itemCarrinho.classList.add('cart__product');
 
-    const img = document.createElement('img');
-    img.classList.add('cart__product--image');
-    img.src = item.img;
-    img.alt = item.nomeProduto;
+        const img = document.createElement('img');
+        img.classList.add('cart__product--image');
+        img.src = item.img;
+        img.alt = item.nomeProduto;
 
-    const coluna = document.createElement('div');
-    coluna.classList.add('cart__product--column');
+        const coluna = document.createElement('div');
+        coluna.classList.add('cart__product--column');
 
-    const nomeProduto = document.createElement('h4');
-    nomeProduto.classList.add('cart__product--name');
-    nomeProduto.textContent = item.nome;
+        const nomeProduto = document.createElement('h4');
+        nomeProduto.classList.add('cart__product--name');
+        nomeProduto.textContent = item.nome;
 
-    const controlesContainer = document.createElement('div');
-    controlesContainer.classList.add('product__quantity');
+        const controlesContainer = document.createElement('div');
+        controlesContainer.classList.add('product__quantity');
 
-    const botaoMenosCarrinho = document.createElement('button');
-    botaoMenosCarrinho.type = 'button';
-    botaoMenosCarrinho.classList.add('product__quantity--minus');
-    botaoMenosCarrinho.innerText = '-';
+        const botaoMenosCarrinho = document.createElement('button');
+        botaoMenosCarrinho.type = 'button';
+        botaoMenosCarrinho.classList.add('product__quantity--minus');
+        botaoMenosCarrinho.innerText = '-';
 
-    const quantidadeProduto = document.createElement('input');
-    quantidadeProduto.classList.add('product__quantity--input');
-    quantidadeProduto.type = 'text';
-    quantidadeProduto.disabled = true;
-    quantidadeProduto.value = item.quantidade;
-
-
-    const botaoMaisCarrinho = document.createElement('button');
-    botaoMaisCarrinho.type = 'button';
-    botaoMaisCarrinho.classList.add('product__quantity--plus');
-    botaoMaisCarrinho.innerText = '+';
-
-    controlesContainer.appendChild(botaoMenosCarrinho);
-    controlesContainer.appendChild(quantidadeProduto);
-    controlesContainer.appendChild(botaoMaisCarrinho);
+        const quantidadeProduto = document.createElement('input');
+        quantidadeProduto.classList.add('product__quantity--input');
+        quantidadeProduto.type = 'text';
+        quantidadeProduto.disabled = true;
+        quantidadeProduto.value = item.quantidade;
 
 
-    const precoProduto = document.createElement('span');
-    precoProduto.classList.add('cart__product--price');
-    precoProduto.textContent = formataPreco(item.preco * item.quantidade)
+        const botaoMaisCarrinho = document.createElement('button');
+        botaoMaisCarrinho.type = 'button';
+        botaoMaisCarrinho.classList.add('product__quantity--plus');
+        botaoMaisCarrinho.innerText = '+';
 
-    const botaoRemover = document.createElement('button');
-    botaoRemover.type = 'button';
-    botaoRemover.classList.add('cart__product--delete');
-    botaoRemover.innerText = 'X';
-    botaoRemover.title = 'Remover';
-        
-
-    coluna.appendChild(nomeProduto);
-    coluna.appendChild(controlesContainer);
-
-    const linha = document.createElement('div');
-    linha.classList.add('cart__product--row');
-    linha.appendChild(coluna);
-    linha.appendChild(precoProduto);
-
-    itemCarrinho.appendChild(img);
-    itemCarrinho.appendChild(linha);
-    itemCarrinho.appendChild(botaoRemover);
-
-    listaCarrinho.appendChild(itemCarrinho);
+        controlesContainer.appendChild(botaoMenosCarrinho);
+        controlesContainer.appendChild(quantidadeProduto);
+        controlesContainer.appendChild(botaoMaisCarrinho);
 
 
-    //eventos
-    botaoMaisCarrinho.addEventListener('click', () => {
-        const c = carregaCarrinho();
-        const i = c.findIndex(p => p.idProduto === item.idProduto);
-        if (i >= 0) {
-            c[i].quantidade += 1;
+        const precoProduto = document.createElement('span');
+        precoProduto.classList.add('cart__product--price');
+        precoProduto.textContent = formataPreco(item.preco * item.quantidade)
+
+        const botaoRemover = document.createElement('button');
+        botaoRemover.type = 'button';
+        botaoRemover.classList.add('cart__product--delete');
+        botaoRemover.innerText = 'X';
+        botaoRemover.title = 'Remover';
+            
+
+        coluna.appendChild(nomeProduto);
+        coluna.appendChild(controlesContainer);
+
+        const linha = document.createElement('div');
+        linha.classList.add('cart__product--row');
+        linha.appendChild(coluna);
+        linha.appendChild(precoProduto);
+
+        linha.appendChild(botaoRemover);
+        itemCarrinho.appendChild(img);
+        itemCarrinho.appendChild(linha);
+
+        listaCarrinho.appendChild(itemCarrinho);
+
+
+        //eventos
+        botaoMaisCarrinho.addEventListener('click', () => {
+            const c = carregaCarrinho();
+            const i = c.findIndex(p => p.idProduto === item.idProduto);
+            if (i >= 0) {
+                c[i].quantidade += 1;
+                salvaCarrinho(c);
+                criaItemCart(c);
+                atualizaNumeroCarrinho(c);
+            }
+        });
+
+        botaoMenosCarrinho.addEventListener('click', () => {
+            const c = carregaCarrinho();
+            const i = c.findIndex(p => p.idProduto === item.idProduto);
+            if (i >= 0) {
+                c[i].quantidade = Math.max(i, c[i].quantidade - 1);
+                salvaCarrinho(c);
+                criaItemCart(c);
+                atualizaNumeroCarrinho(c);
+            }
+        });
+
+        botaoRemover.addEventListener('click', () => {
+            const c = carregaCarrinho().filter(p => p.idProduto !== item.idProduto);
             salvaCarrinho(c);
             criaItemCart(c);
             atualizaNumeroCarrinho(c);
-        }
-    });
-
-    botaoMenosCarrinho.addEventListener('click', () => {
-        const c = carregaCarrinho();
-        const i = c.findIndex(p => p.idProduto === item.idProduto);
-        if (i >= 0) {
-            c[i].quantidade = Math.max(i, c[i].quantidade - 1);
-            salvaCarrinho(c);
-            criaItemCart(c);
-            atualizaNumeroCarrinho(c);
-        }
-    });
-
-    botaoRemover.addEventListener('click', () => {
-        const c = carregaCarrinho().filter(p => p.idProduto !== item.idProduto);
-        salvaCarrinho(c);
-        criaItemCart(c);
-        atualizaNumeroCarrinho(c);
-    });
+        });
 
 
-    const [subtotalEl, , totalEl] = rodape.querySelectorAll('.cart__footer--row .cart__footer--price');
-    if (subtotalEl) subtotalEl.textContent = formataPreco(valor);
-    if (totalEl) totalEl.textContent = formataPreco(valor);
-    quantidadeSpan.textContent = `${carrinho.reduce((a,b)=>a + Number(b.quantidade||0),0)} item(ns)`;
-}
+        const [subtotalEl, , totalEl] = rodape.querySelectorAll('.cart__footer--row .cart__footer--price');
+        if (subtotalEl) subtotalEl.textContent = formataPreco(valor);
+        if (totalEl) totalEl.textContent = formataPreco(valor);
+        quantidadeSpan.textContent = `${carrinho.reduce((a,b)=>a + Number(b.quantidade||0),0)} item(ns)`;
+    }
 )};
 
     
