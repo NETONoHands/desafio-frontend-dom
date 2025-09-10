@@ -1,7 +1,7 @@
 import {dados} from './data.js';
 
 
-// construtor de produtos
+// construtor de produtos 
 const containerClassicos = document.querySelector('.container__classicos');
 const containerGelados = document.querySelector('.container__gelados');
 
@@ -17,7 +17,7 @@ dados.produtos.forEach(produto => {
 
     const preco = document.createElement('h3');
     preco.classList.add('products__list--price');
-    preco.innerHTML = 'R$ ' + formataPreco(produto.preco.por) + '<span> R$ ' + formataPreco(produto.preco.de) + '</span>';
+    preco.innerHTML = formataPreco(produto.preco.por) + '<span> ' + formataPreco(produto.preco.de) + '</span>';
 
     const nome = document.createElement('h4');
     nome.classList.add('products__list--name');
@@ -57,7 +57,6 @@ dados.produtos.forEach(produto => {
     const visualizarQtde = document.createElement('input');
     visualizarQtde.classList.add('product__quantity--input');
     visualizarQtde.type = 'text';
-    visualizarQtde.disabled = true;
     visualizarQtde.value = 1;
 
     const botaoMais = document.createElement('button');
@@ -81,8 +80,8 @@ dados.produtos.forEach(produto => {
     productDiv.appendChild(nome);
     productDiv.appendChild(tag);
     productDiv.appendChild(formulario);
-    formulario.appendChild(div3);
     div3.appendChild(sessionQtde);
+    formulario.appendChild(div3);
     productDiv.appendChild(botaoComprar);
 
     if (produto.categoria === 'classicos') {
@@ -109,9 +108,15 @@ dados.produtos.forEach(produto => {
         const quantidade = parseInt(visualizarQtde.value);
         addCarrinho(produto, quantidade);
         atualizaNumeroCarrinho();
-        alert(`Você adicionou ${quantidade} unidade(s) de ${produto.nome} ao carrinho.`);
-    }
-)
+    });
+
+    visualizarQtde.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            const quantidade = parseInt(visualizarQtde.value);
+        addCarrinho(produto, quantidade);
+        atualizaNumeroCarrinho();
+        }
+    });
 });
 
 
@@ -224,11 +229,14 @@ botaoFechar.addEventListener('click', () => {
     carrinho.classList.remove('cart--active');
 })
 
-deletaTudo.addEventListener('click', () => {
-    salvaCarrinho([]);
-    criaItemCart([]);
-    atualizaNumeroCarrinho([]);
-    quantidadeSpan.textContent = '0 item(ns)';
+finalizarButton.addEventListener('click', () => {
+
+    const carrinhoAtual = carregaCarrinho();
+    if (carrinhoAtual.length === 0) {
+        alert('A compra não foi efetivada porque o carrinho está vazio.');
+    } else {
+            alert('Compra realizada com sucesso');
+    }
 })
 
 
@@ -261,7 +269,9 @@ function criaItemCart(carrinho = carregaCarrinho()) {
         const botaoMenosCarrinho = document.createElement('button');
         botaoMenosCarrinho.type = 'button';
         botaoMenosCarrinho.classList.add('product__quantity--minus');
-        botaoMenosCarrinho.innerText = '-';
+        const imgMenosCarrinho = document.createElement('img');
+        imgMenosCarrinho.src = './image/Minus.svg';
+        botaoMenosCarrinho.appendChild(imgMenosCarrinho);
 
         const quantidadeProduto = document.createElement('input');
         quantidadeProduto.classList.add('product__quantity--input');
@@ -273,7 +283,10 @@ function criaItemCart(carrinho = carregaCarrinho()) {
         const botaoMaisCarrinho = document.createElement('button');
         botaoMaisCarrinho.type = 'button';
         botaoMaisCarrinho.classList.add('product__quantity--plus');
-        botaoMaisCarrinho.innerText = '+';
+        const imgMaisCarrinho = document.createElement('img');
+        imgMaisCarrinho.src = './image/Plus.svg';
+        botaoMaisCarrinho.appendChild(imgMaisCarrinho);
+
 
         controlesContainer.appendChild(botaoMenosCarrinho);
         controlesContainer.appendChild(quantidadeProduto);
@@ -287,8 +300,9 @@ function criaItemCart(carrinho = carregaCarrinho()) {
         const botaoRemover = document.createElement('button');
         botaoRemover.type = 'button';
         botaoRemover.classList.add('cart__product--delete');
-        botaoRemover.innerText = 'X';
-        botaoRemover.title = 'Remover';
+        const imgLixo = document.createElement('img');
+        imgLixo.src = './image/Trash.svg';
+        botaoRemover.appendChild(imgLixo);
             
 
         coluna.appendChild(nomeProduto);
@@ -310,7 +324,11 @@ function criaItemCart(carrinho = carregaCarrinho()) {
         botaoMaisCarrinho.addEventListener('click', () => {
             const c = carregaCarrinho();
             const i = c.findIndex(p => p.idProduto === item.idProduto);
-            if (i >= 0) {
+
+            if (c[i].quantidade >= 99) {
+                alert("Não é possível adicionar mais de 99 unidades.");
+            return;
+            } else if (i >= 0) {
                 c[i].quantidade += 1;
                 salvaCarrinho(c);
                 criaItemCart(c);
@@ -335,22 +353,45 @@ function criaItemCart(carrinho = carregaCarrinho()) {
             criaItemCart(c);
             atualizaNumeroCarrinho(c);
         });
+    }
+)
 
-
-        const [subtotalEl, , totalEl] = rodape.querySelectorAll('.cart__footer--row .cart__footer--price');
+const [subtotalEl, , totalEl] = rodape.querySelectorAll('.cart__footer--row .cart__footer--price');
         if (subtotalEl) subtotalEl.textContent = formataPreco(valor);
         if (totalEl) totalEl.textContent = formataPreco(valor);
         quantidadeSpan.textContent = `${carrinho.reduce((a,b)=>a + Number(b.quantidade||0),0)} item(ns)`;
-    }
-)};
 
-    
+};
 
+
+
+deletaTudo.addEventListener('click', () => {
+    salvaCarrinho([]);
+    criaItemCart([]);
+    atualizaNumeroCarrinho([]);
+});
 
 
 function addCarrinho(item, quantidade) {
     const carrinho = carregaCarrinho();
     const id = carrinho.findIndex(i => i.idProduto === item.id);
+    let novoTotal;
+
+    const totalAtual = carrinho.reduce((acc, item) => {
+        return acc += item.quantidade;
+    }, 0);
+
+    if (id >= 0) {
+        novoTotal = totalAtual - carrinho[id].quantidade + (carrinho[id].quantidade + quantidade);
+    } else {
+        novoTotal = totalAtual + quantidade;
+    }
+
+    if (novoTotal > 99) {
+        alert("Não é possível adicionar mais de 99 unidades.");
+            return;
+    }
+
     if (id >= 0) {
         carrinho[id].quantidade += quantidade;
     } else {
@@ -363,9 +404,12 @@ function addCarrinho(item, quantidade) {
             quantidade
         })
     }
+
     salvaCarrinho(carrinho);
     criaItemCart(carrinho);
     atualizaNumeroCarrinho(carrinho);
+    alert(`Você adicionou ${quantidade} unidade(s) de ${item.nome} ao carrinho.`);
+
 }
 
 
